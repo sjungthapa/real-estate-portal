@@ -1,0 +1,17 @@
+{
+  "name": "buyer-portal",
+  "version": "1.0.0",
+  "description": "Real estate buyer portal with auth and favourites",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "better-sqlite3": "^9.2.2",
+    "cookie-parser": "^1.4.6"
+  }
+}

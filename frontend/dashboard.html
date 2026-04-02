@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Portal - Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header>
+      <h1>Buyer Portal</h1>
+      <div class="user-info">
+        <span id="user-name"></span>
+        <button id="logout-btn">Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="favourites-section">
+        <h2>My Favourites</h2>
+        <div id="favourites-list" class="property-grid"></div>
+      </section>
+
+      <section class="properties-section">
+        <h2>All Properties</h2>
+        <div id="properties-list" class="property-grid"></div>
+      </section>
+    </main>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    const showMessage = (text, isError = false) => {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = `message ${isError ? 'error' : 'success'}`;
+      setTimeout(() => messageEl.className = 'message', 3000);
+    };
+
+    const formatPrice = (price) => {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
+    };
+
+    const createPropertyCard = (property, isFavouritesList = false) => {
+      const card = document.createElement('div');
+      card.className = 'property-card';
+      card.innerHTML = `
+        <h3>${property.title}</h3>
+        <p class="address">${property.address}</p>
+        <p class="price">${formatPrice(property.price)}</p>
+        <p class="description">${property.description}</p>
+        <button class="fav-btn ${property.isFavourite ? 'active' : ''}" data-id="${property.id}">
+          ${property.isFavourite ? '❤️ Remove from Favourites' : '🤍 Add to Favourites'}
+        </button>
+      `;
+
+      const btn = card.querySelector('.fav-btn');
+      btn.addEventListener('click', () => toggleFavourite(property.id, property.isFavourite));
+
+      return card;
+    };
+
+    const toggleFavourite = async (propertyId, isFavourite) => {
+      try {
+        const method = isFavourite ? 'DELETE' : 'POST';
+        const response = await fetch(`/api/favourites/${propertyId}`, { method });
+        const data = await response.json();
+
+        if (response.ok) {
+          showMessage(data.message);
+          loadDashboard();
+        } else {
+          showMessage(data.error || 'Operation failed', true);
+        }
+      } catch (error) {
+        showMessage('Network error. Please try again.', true);
+      }
+    };
+
+    const loadDashboard = async () => {
+      try {
+        const [userRes, propertiesRes, favouritesRes] = await Promise.all([
+          fetch('/api/me'),
+          fetch('/api/properties'),
+          fetch('/api/favourites')
+        ]);
+
+        if (!userRes.ok) {
+          window.location.href = '/';
+          return;
+        }
+
+        currentUser = await userRes.json();
+        const properties = await propertiesRes.json();
+        const favourites = await favouritesRes.json();
+
+        document.getElementById('user-name').textContent = `${currentUser.name} (${currentUser.role})`;
+
+        const favouritesList = document.getElementById('favourites-list');
+        if (favourites.length === 0) {
+          favouritesList.innerHTML = '<p class="empty-state">No favourites yet. Browse properties below!</p>';
+        } else {
+          favouritesList.innerHTML = '';
+          favourites.forEach(prop => {
+            prop.isFavourite = true;
+            favouritesList.appendChild(createPropertyCard(prop, true));
+          });
+        }
+
+        const propertiesList = document.getElementById('properties-list');
+        propertiesList.innerHTML = '';
+        properties.forEach(prop => {
+          propertiesList.appendChild(createPropertyCard(prop));
+        });
+      } catch (error) {
+        showMessage('Failed to load dashboard', true);
+      }
+    };
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/';
+    });
+
+    loadDashboard();
+  </script>
+</body>
+</html>

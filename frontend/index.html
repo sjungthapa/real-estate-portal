@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Portal - Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="auth-box">
+      <h1>Buyer Portal</h1>
+      
+      <div id="login-form" class="form-section">
+        <h2>Login</h2>
+        <form id="loginForm">
+          <input type="email" id="login-email" placeholder="Email" required>
+          <input type="password" id="login-password" placeholder="Password" required>
+          <button type="submit">Login</button>
+        </form>
+        <p class="toggle-link">Don't have an account? <a href="#" id="show-register">Register</a></p>
+      </div>
+
+      <div id="register-form" class="form-section hidden">
+        <h2>Register</h2>
+        <form id="registerForm">
+          <input type="text" id="register-name" placeholder="Full Name" required>
+          <input type="email" id="register-email" placeholder="Email" required>
+          <input type="password" id="register-password" placeholder="Password (min 6 characters)" required>
+          <button type="submit">Register</button>
+        </form>
+        <p class="toggle-link">Already have an account? <a href="#" id="show-login">Login</a></p>
+      </div>
+
+      <div id="message" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    const showMessage = (text, isError = false) => {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = text;
+      messageEl.className = `message ${isError ? 'error' : 'success'}`;
+      setTimeout(() => messageEl.className = 'message', 3000);
+    };
+
+    document.getElementById('show-register').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('login-form').classList.add('hidden');
+      document.getElementById('register-form').classList.remove('hidden');
+    });
+
+    document.getElementById('show-login').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('register-form').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          showMessage('Login successful! Redirecting...');
+          setTimeout(() => window.location.href = '/dashboard.html', 1000);
+        } else {
+          showMessage(data.error || 'Login failed', true);
+        }
+      } catch (error) {
+        showMessage('Network error. Please try again.', true);
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('register-name').value;
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          showMessage('Registration successful! Redirecting...');
+          setTimeout(() => window.location.href = '/dashboard.html', 1000);
+        } else {
+          showMessage(data.error || 'Registration failed', true);
+        }
+      } catch (error) {
+        showMessage('Network error. Please try again.', true);
+      }
+    });
+  </script>
+</body>
+</html>
