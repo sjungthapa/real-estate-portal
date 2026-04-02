@@ -3,3 +3,5 @@ portal.db
 *.log
 .env
 .DS_Store
+client/build/
+client/.env.local

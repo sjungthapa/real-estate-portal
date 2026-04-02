@@ -16,25 +16,50 @@ A simple real estate buyer portal with authentication and property favourites fu
 ## Tech Stack
 
 - Backend: Node.js + Express
-- Database: SQLite (better-sqlite3)
+- Database: SQLite (sqlite3)
 - Auth: JWT + bcryptjs
-- Frontend: Vanilla HTML/CSS/JavaScript
+- Frontend: React + React Router
 
 ## Installation
 
-1. Install dependencies:
+1. Install backend dependencies:
 ```bash
 npm install
 ```
 
-## Running the Application
-
-Start the server:
+2. Install frontend dependencies:
 ```bash
-npm start
+cd client
+npm install
+cd ..
 ```
 
-The application will be available at `http://localhost:3001`
+## Running the Application
+
+You need to run backend and frontend in separate terminals:
+
+**Terminal 1 - Backend:**
+```bash
+npm start
+# or
+npm run server
+```
+Backend will run on `http://localhost:4000`
+
+**Terminal 2 - Frontend:**
+```bash
+npm run client
+```
+Frontend will run on `http://localhost:3000`
+
+The React app uses a proxy to connect to the backend API, so all `/api/*` requests from the frontend automatically go to `http://localhost:4000`.
+
+### Production Build
+
+```bash
+npm run build
+NODE_ENV=production npm start
+```
 
 ## Example Flows
 
@@ -114,11 +139,13 @@ The application will be available at `http://localhost:3001`
 
 ## Sample Data
 
-The application seeds 4 sample properties on first run:
-1. Modern Downtown Condo - $450,000
-2. Suburban Family Home - $650,000
-3. Luxury Penthouse - $1,200,000
-4. Cozy Starter Home - $320,000
+The application seeds 6 sample properties on first run:
+1. Modern Apartment in Thamel - NPR 15,000,000
+2. Spacious House in Lalitpur - NPR 35,000,000
+3. Penthouse in Durbar Marg - NPR 75,000,000
+4. Cozy Flat in Bhaktapur - NPR 8,500,000
+5. Villa in Budhanilkantha - NPR 55,000,000
+6. Commercial Space in New Road - NPR 45,000,000
 
 ## Project Structure
 
@@ -128,10 +155,16 @@ buyer-portal/
 │   ├── server.js      # Express server and routes
 │   ├── db.js          # Database operations
 │   └── auth.js        # JWT auth logic
-├── frontend/
-│   ├── index.html     # Login/Register page
-│   ├── dashboard.html # User dashboard
-│   └── styles.css     # Styling
+├── client/
+│   ├── public/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Login.js      # Login/Register page
+│   │   │   └── Dashboard.js  # User dashboard
+│   │   ├── App.js
+│   │   ├── App.css
+│   │   └── index.js
+│   └── package.json
 ├── package.json
 └── README.md
 ```
