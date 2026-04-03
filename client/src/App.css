@@ -73,12 +73,13 @@
   color: #666;
 }
 
-.toggle-link button {
-  background: none;
-  border: none;
+.toggle-link a {
   color: #667eea;
   font-weight: 600;
-  cursor: pointer;
+  text-decoration: none;
+}
+
+.toggle-link a:hover {
   text-decoration: underline;
 }
 

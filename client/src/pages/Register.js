@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-function Login() {
+function Register() {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    name: ''
   });
   const [message, setMessage] = useState({ text: '', type: '' });
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -36,10 +37,10 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        showMessage('Login successful!', 'success');
+        showMessage('Registration successful!', 'success');
         setTimeout(() => navigate('/dashboard'), 1000);
       } else {
-        showMessage(data.error || 'Login failed', 'error');
+        showMessage(data.error || 'Registration failed', 'error');
       }
     } catch (error) {
       showMessage('Network error. Please try again.', 'error');
@@ -53,9 +54,18 @@ function Login() {
       <div className="auth-box">
         <h1>Buyer Portal</h1>
         
-        <h2>Login</h2>
+        <h2>Create Account</h2>
         
         <form className="auth-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          
           <input
             type="email"
             name="email"
@@ -68,19 +78,20 @@ function Login() {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Password (min 6 characters)"
             value={formData.password}
             onChange={handleChange}
             required
+            minLength={6}
           />
           
           <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
 
         <div className="toggle-link">
-          Don't have an account? <Link to="/register">Register</Link>
+          Already have an account? <Link to="/">Login</Link>
         </div>
 
         {message.text && (
@@ -93,4 +104,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
